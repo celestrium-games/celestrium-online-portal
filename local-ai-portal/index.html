@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLAN-T5 Chat</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+  --bg: #f5f7fb;
+  --chat-bg: #ffffff;
+  --user-bg: #d0f0fd;
+  --ai-bg: #f0f0f0;
+  --text: #1a1a1a;
+  --accent: #4a90e2;
+  --shadow: rgba(0,0,0,0.08);
+}
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+#status {
+  text-align: center;
+  padding: 10px;
+  background: #fff3cd;
+  color: #856404;
+  font-weight: 500;
+}
+#chatContainer {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+#messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.message {
+  position: relative;
+  padding: 14px 18px;
+  border-radius: 14px;
+  max-width: 75%;
+  white-space: pre-wrap;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: box-shadow .2s;
+}
+.message:hover { box-shadow: 0 4px 20px var(--shadow); }
+.user-message { background: var(--user-bg); align-self: flex-end; }
+.ai-message { background: var(--ai-bg); align-self: flex-start; }
+.action-buttons {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  gap: 6px;
+}
+.message:hover .action-buttons { display: flex; }
+.action-buttons button {
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.action-buttons button:hover { opacity: 0.85; }
+#inputContainer {
+  display: flex;
+  padding: 14px 20px;
+  background: var(--chat-bg);
+  border-top: 1px solid #ddd;
+}
+#userInput {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  resize: none;
+  background: #fafafa;
+  color: var(--text);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+  transition: border-color .25s, box-shadow .25s;
+}
+#userInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(74,144,226,0.3);
+}
+#sendButton {
+  margin-left: 12px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+#sendButton:hover { background: #3a7bd5; transform: translateY(-1px); }
+#messages::-webkit-scrollbar { width: 8px; }
+#messages::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 4px; }
+#messages::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<div id="status">Loading AI model, please wait...</div>
+<div id="chatContainer">
+  <div id="messages"></div>
+</div>
+<div id="inputContainer">
+  <textarea id="userInput" placeholder="Type your message..." rows="2" disabled></textarea>
+  <button id="sendButton" disabled><i class="fas fa-paper-plane"></i> Send</button>
+</div>
+
+<script type="module">
+import { AutoTokenizer, AutoModelForSeq2SeqLM, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.4.0/dist/transformers.min.js';
+
+const messagesEl = document.getElementById('messages');
+const userInput = document.getElementById('userInput');
+const sendButton = document.getElementById('sendButton');
+
+let generator;
+let lastUser = '';
+let loadingMessageEl;
+
+// Append AI message
+function appendAI(text='Loading...') {
+  const m = document.createElement('div');
+  m.className = 'message ai-message';
+  const textEl = document.createElement('div');
+  textEl.textContent = text;
+
+  const actions = document.createElement('div');
+  actions.className = 'action-buttons';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(textEl.textContent);
+    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied';
+    setTimeout(() => copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy', 1000);
+  };
+
+  const regenBtn = document.createElement('button');
+  regenBtn.innerHTML = '<i class="fas fa-redo"></i> Regenerate';
+  regenBtn.onclick = async () => { if (lastUser) await runChat(lastUser); };
+
+  actions.append(copyBtn, regenBtn);
+  m.append(textEl, actions);
+  messagesEl.appendChild(m);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return textEl;
+}
+
+// Add initial loading bubble
+loadingMessageEl = appendAI('Loading AI model, please wait...');
+
+// Chat function
+async function runChat(msg) {
+  if (!generator) return;
+  appendMessage(msg, 'user-message');
+  userInput.value = '';
+  lastUser = msg;
+  const aiTextEl = appendAI('Generating...');
+  try {
+    const output = await generator(msg);
+    aiTextEl.textContent = output[0].generated_text || 'Error: no response from model.';
+  } catch (e) {
+    aiTextEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// Load model from local files + Dropbox bin
+(async () => {
+  try {
+    const tokenizer = await AutoTokenizer.from_pretrained('flan-t5-small/');
+    const model = await AutoModelForSeq2SeqLM.from_pretrained(
+      'https://www.dropbox.com/s/53huuzirxdsfniwdy1xt8/pytorch_model.bin?dl=1',
+      { tokenizer }
+    );
+    generator = pipeline('text2text-generation', model);
+
+    // Update loading bubble
+    loadingMessageEl.textContent = 'AI model loaded! You can start chatting.';
+    userInput.disabled = false;
+    sendButton.disabled = false;
+  } catch (e) {
+    loadingMessageEl.textContent = 'Error loading model: ' + e.message;
+  }
+})();
+
+// User input
+sendButton.addEventListener('click', () => runChat(userInput.value));
+userInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    runChat(userInput.value);
+  }
+});
+</script>
+
+</body>
+</html>
