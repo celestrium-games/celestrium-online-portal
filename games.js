@@ -1,7 +1,7 @@
 const games = [
     {name:"1 On 1 Soccer", url:"1on1-soccer/?login.live.com", grade:"all-grades"},
     {name:"1v1.lol", url:"1v1lol/", grade:"high-school-only"},
-    {name:"10 Minutes Till Dawn", url:"10-minutes-till-dawn/?login.live.com", grade:"all-grades"},
+    {name:"10 Minutes Till Dawn", url:"10-minutes-till-dawn/", grade:"high-schoolo-only"},
     {name:"2048", url:"2048/", grade:"high-school-only"},
     {name:"A Dance of Fire and Ice", url:"a-dance-of-fire-and-ice/?login.live.com", grade:"all-grades"},
     {name:"Age of War", url:"age-of-war/?login.live.com", grade:"all-grades"},
@@ -29,7 +29,6 @@ const games = [
     {name:"Fireboy and Watergirl", url:"fireboy-and-watergirl/", grade:"high-school-only"},
     {name:"Five Nights at Freddy's 4", url:"five-nights-at-freddys-4/?login.live.com", grade:"all-grades"},
     {name:"Fruit Ninja", url:"fruit-ninja/?login.live.com", grade:"all-grades"},
-    {name:"Geometry Dash Lite", url:"geometry-dash-lite/?login.live.com", grade:"all-grades"},
     {name:"Getaway Shootout", url:"getaway-shootout/", grade:"high-school-only"},
     {name:"Grow A Garden", url:"grow-a-garden/?login.live.com", grade:"all-grades"},
     {name:"Hei$t", url:"heist/?login.live.com", grade:"all-grades"},
@@ -57,9 +56,7 @@ const games = [
     {name:"PolyTrack (Old)", url:"polytrack-old/?login.live.com", grade:"all-grades"},
     {name:"Raft Wars 2", url:"raft-wars-2/", grade:"high-school-only"},
     {name:"Retro Bowl", url:"retrobowl/?login.live.com", grade:"all-grades"},
-    {name:"Retro Bowl - College", url:"retrobowl-college/?login.live.com", grade:"all-grades"},
     {name:"Rooftop Snipers", url:"rooftop-snipers/?login.live.com", grade:"all-grades"},
-    {name:"Rooftop Snipers 2", url:"rooftop-snipers-2/?login.live.com", grade:"all-grades"},
     {name:"Run 3", url:"run3/?login.live.com", grade:"all-grades"},
     {name:"Santa Tracker: Snowball Storm", url:"snowball-storm/?login.live.com", grade:"all-grades"},
     {name:"Slope", url:"slope/?login.live.com", grade:"all-grades"},
@@ -70,7 +67,6 @@ const games = [
     {name:"Stick Rush", url:"stick-rush", grade:"high-school-only"},
     {name:"Stickman Climb", url:"stickman-climb", grade:"high-school-only"},
     {name:"Stickman Hook", url:"stickman-hook/?login.live.com", grade:"all-grades"},
-    {name:"Subway Surfers Barcelona", url:"subway-surfers-barcelona/", grade:"high-school-only"},
     {name:"Subway Surfers NYC", url:"subway-surfers-nyc/", grade:"high-school-only"},
     {name:"Super Liquid Soccer", url:"super-liquid-soccer/", grade:"high-school-only"},
     {name:"Super Mario Bros", url:"super-mario-bros/?login.live.com", grade:"all-grades"},
@@ -87,6 +83,5 @@ const games = [
     {name:"The Knights Battle Arena", url:"war-the-knights-battle-arena-swords/?login.live.com", grade:"all-grades"},
     {name:"We Become What We Behold", url:"we-become-what-we-behold/?login.live.com", grade:"all-grades"},
     {name:"Wheely 8", url:"wheely-8/?login.live.com", grade:"all-grades"},
-    {name:"Wordle+", url:"wordle+/?login.live.com", grade:"all-grades"},
-    {name:"World's Hardest Game 4", url:"worlds-hardest-games-4/?login.live.com", grade:"all-grades"}
+    {name:"Wordle+", url:"wordle+/?login.live.com", grade:"all-grades"}
 ];
