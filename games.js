@@ -32,6 +32,7 @@ const games = [
     {name:"Escape Road", url:"escape-road/?login.live.com", grade:"all-grades"},
     {name:"Fireboy and Watergirl", url:"fireboy-and-watergirl/", grade:"high-school-only"},
     {name:"Five Nights at Freddy's 4", url:"five-nights-at-freddys-4/?login.live.com", grade:"all-grades"},
+    {name:"Flappy Bird", url:"flappy-bird/", grade:"high-school-only"},
     {name:"Fruit Ninja", url:"fruit-ninja/?login.live.com", grade:"all-grades"},
     {name:"Getaway Shootout", url:"getaway-shootout/", grade:"high-school-only"},
     {name:"Grow A Garden", url:"grow-a-garden/?login.live.com", grade:"all-grades"},
