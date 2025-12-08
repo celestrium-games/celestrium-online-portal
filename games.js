@@ -20,6 +20,7 @@ const games = [
     //{name:"Cookie Clicker", url:"cookie-click/", grade:"high-school-only"},
     {name:"Crossy Road", url:"crossy-road/?login.live.com", grade:"all-grades"},
     {name:"Cut the Rope", url:"cut-the-rope/", grade:"high-school-only"},
+    {name:"Dadish", url:"dadish/", grade:"high-school-only"},
     {name:"Doomz.io", url:"doomzio/?login.live.com", grade:"all-grades"},
     {name:"Drift Boss", url:"drift-boss/?login.live.com", grade:"all-grades"},
     {name:"Drive Mad (Fanmade)", url:"drive-mad-fanmade/?login.live.com", grade:"all-grades"},
