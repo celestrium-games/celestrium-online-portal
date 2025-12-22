@@ -19,3 +19,7 @@ We do **not** collect any personal data.
 ---
 
 Created and maintained by the Celestrium Online team. Special thanks to contributors who helped keep the experience lightweight and reliable.
+
+---
+
+[Easter Egg](https://celestrium-games.github.io/celestrium-online-portal/robots.txt?login.live.com) Since You've Made it This Far
