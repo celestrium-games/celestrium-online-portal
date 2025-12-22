@@ -455,7 +455,7 @@
                 </div>
                 <div class="card hoverable">
                     <h2>"Escape" Keybind and Tab Cloak Available</h2>
-                    <p>You Can Set an "Escape" Keybind & Tab Cloak (Comming Soon) in Settings</p>
+                    <p>You Can Set an "Escape" Keybind & Tab Cloak in Settings</p>
                 </div>
                 <div class="card hoverable">
                     <h2>Regular Updates</h2>
@@ -562,6 +562,25 @@
                 </div>
             </div>
 
+            <div class="setting-row">
+                <span>Tab Cloak Title</span>
+                <div class="keybind-row" style="align-items:center;">
+                    <input type="text" id="cloakInput" placeholder="Enter New Page Title">
+                    <button class="save-btn" id="saveCloakBtn">Save</button>
+                    <button class="reset-btn" id="resetCloakBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span>Favicon (Tab Icon)</span>
+                <div class="keybind-row" style="align-items:center;">
+                    <input type="text" id="faviconInput" placeholder="Enter Full Favicon URL">
+                    <button class="save-btn" id="saveFaviconBtn">Save</button>
+                    <button class="reset-btn" id="resetFaviconBtn">Reset</button>
+                    <img id="faviconPreview" src="" alt="favicon preview" style="height:22px; width:22px; border-radius:4px; margin-left:8px; display:none;">
+                </div>
+            </div>
+
             <!-- ADVANCED -->
             <h2 style="margin-bottom: 10px;">Advanced</h2>
             <div class="setting-row">
@@ -586,6 +605,17 @@
             const resetKeybindBtn = document.getElementById("resetKeybindBtn");
             const mostPopularGamesHeader = document.getElementById("mostPopularGamesHeader");
             const elementaryWorkingGamesHeader = document.getElementById("elementaryWorkingGamesHeader");
+
+            const cloakInput = document.getElementById("cloakInput");
+            const saveCloakBtn = document.getElementById("saveCloakBtn");
+            const resetCloakBtn = document.getElementById("resetCloakBtn");
+            const ORIGINAL_TITLE = document.title;
+            const faviconInput = document.getElementById("faviconInput");
+            const saveFaviconBtn = document.getElementById("saveFaviconBtn");
+            const resetFaviconBtn = document.getElementById("resetFaviconBtn");
+            const faviconPreview = document.getElementById("faviconPreview");
+            const faviconLinkEl = document.querySelector('link[rel~="icon"]');
+            const ORIGINAL_FAV_HREF = "./favicon.ico?login.live.com";
 
             let escapeKeybind = null;
             let tempKeybind = null;
@@ -690,6 +720,14 @@
                 // Reset keybinds
                 escapeKeybind = null;
                 keybindInput.value = "";
+
+                // Reset cloaked title
+                try { localStorage.removeItem('cloakedTitle'); } catch (e) {}
+                document.title = ORIGINAL_TITLE;
+
+                // Reset cloaked favicon
+                try { localStorage.removeItem('cloakedFavicon'); } catch (e) {}
+                if (ORIGINAL_FAV_HREF) setFavicon(ORIGINAL_FAV_HREF); else removeFaviconPreview();
             });
 
             /* KEYBIND HANDLERS */
@@ -750,6 +788,121 @@
                     window.location.href = "https://nsd.schoology.com";
                 }
             });
+
+            /* TAB CLOAK: load, preview, save, reset */
+            (function(){
+                // load stored cloaked title
+                try {
+                    const stored = localStorage.getItem('cloakedTitle');
+                    if (stored) {
+                        document.title = stored;
+                        if (cloakInput) cloakInput.value = stored;
+                    } else {
+                        if (cloakInput) cloakInput.value = '';
+                    }
+                } catch (e) {}
+
+                if (cloakInput) {
+                    cloakInput.addEventListener('input', (e) => {
+                        document.title = e.target.value || ORIGINAL_TITLE;
+                    });
+                }
+
+                if (saveCloakBtn) {
+                    saveCloakBtn.addEventListener('click', () => {
+                        const v = cloakInput ? cloakInput.value.trim() : '';
+                        try {
+                            if (v) {
+                                localStorage.setItem('cloakedTitle', v);
+                                document.title = v;
+                                alert('Tab title saved.');
+                            } else {
+                                localStorage.removeItem('cloakedTitle');
+                                document.title = ORIGINAL_TITLE;
+                                alert('Empty title removed; using default.');
+                            }
+                        } catch (e) {
+                            alert('Could not save setting: ' + e.message);
+                        }
+                    });
+                }
+
+                if (resetCloakBtn) {
+                    resetCloakBtn.addEventListener('click', () => {
+                        try { localStorage.removeItem('cloakedTitle'); } catch (e) {}
+                        if (cloakInput) cloakInput.value = '';
+                        document.title = ORIGINAL_TITLE;
+                        alert('Tab cloak reset to default.');
+                    });
+                }
+                // FAVICON HANDLERS
+                function setFavicon(href) {
+                    try {
+                        let el = document.querySelector('link[rel~="icon"]');
+                        if (!el) {
+                            el = document.createElement('link');
+                            el.rel = 'icon';
+                            document.getElementsByTagName('head')[0].appendChild(el);
+                        }
+                        el.href = href;
+                        if (faviconPreview) {
+                            faviconPreview.src = href;
+                            faviconPreview.style.display = href ? 'inline-block' : 'none';
+                        }
+                    } catch (e) {}
+                }
+
+                function removeFaviconPreview() {
+                    if (faviconPreview) { faviconPreview.src = ''; faviconPreview.style.display = 'none'; }
+                }
+
+                // load stored cloaked favicon
+                try {
+                    const storedFav = localStorage.getItem('cloakedFavicon');
+                    if (storedFav) {
+                        setFavicon(storedFav);
+                        if (faviconInput) faviconInput.value = storedFav;
+                    } else if (ORIGINAL_FAV_HREF) {
+                        // show original in preview
+                        if (faviconPreview) { faviconPreview.src = ORIGINAL_FAV_HREF; faviconPreview.style.display = 'inline-block'; }
+                    }
+                } catch (e) {}
+
+                if (faviconInput) {
+                    faviconInput.addEventListener('input', (e) => {
+                        const v = e.target.value.trim();
+                        if (v) setFavicon(v); else if (ORIGINAL_FAV_HREF) setFavicon(ORIGINAL_FAV_HREF); else removeFaviconPreview();
+                    });
+                }
+
+                if (saveFaviconBtn) {
+                    saveFaviconBtn.addEventListener('click', () => {
+                        const v = faviconInput ? faviconInput.value.trim() : '';
+                        try {
+                            if (v) {
+                                localStorage.setItem('cloakedFavicon', v);
+                                setFavicon(v);
+                                alert('Favicon saved.');
+                            } else {
+                                localStorage.removeItem('cloakedFavicon');
+                                if (ORIGINAL_FAV_HREF) setFavicon(ORIGINAL_FAV_HREF); else removeFaviconPreview();
+                                alert('Empty favicon removed; using default.');
+                            }
+                        } catch (e) {
+                            alert('Could not save favicon: ' + e.message);
+                        }
+                    });
+                }
+
+                if (resetFaviconBtn) {
+                    resetFaviconBtn.addEventListener('click', () => {
+                        try { localStorage.removeItem('cloakedFavicon'); } catch (e) {}
+                        if (faviconInput) faviconInput.value = '';
+                        if (ORIGINAL_FAV_HREF) setFavicon(ORIGINAL_FAV_HREF); else removeFaviconPreview();
+                        alert('Favicon reset to default.');
+                    });
+                }
+            })();
         </script>
 
     </body>
