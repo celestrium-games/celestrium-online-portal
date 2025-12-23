@@ -11,7 +11,7 @@ Games are organized into a searchable, curated library. Links open in a lightwei
 - **Fast Loading** — Optimized assets for quick navigation  
 - **Privacy Tools** — Tab cloak and escape keybind  
 - **Responsive Design** — Works on school Chromebooks, laptops, tablets, and phones  
-- **Customizable Settings** — Dark mode, animations toggle, default game filter  
+- **Customizable Settings** — Dark mode, animations toggle  
 
 ## Privacy & Safety
 We do **not** collect any personal data.

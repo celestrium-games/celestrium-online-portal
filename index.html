@@ -276,6 +276,27 @@
                 margin: 26px 0;
             }
 
+            /* Editor's Picks carousel styles */
+            .home-features { margin-top: 24px; }
+            .editor-carousel { display:flex; align-items:center; gap:10px; }
+            .carousel-track { display:flex; gap:12px; overflow-x:auto; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; padding:10px 6px; }
+
+            /* Hide scrollbars but keep scrolling functional */
+            .carousel-track {
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE 10+ */
+            }
+            .carousel-track::-webkit-scrollbar { width: 0; height: 0; display: none; }
+            .carousel-item { display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:140px; max-width:180px; padding:12px; border-radius:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid rgba(0,0,0,0.04); cursor:pointer; text-align:center; }
+            .carousel-item img { width:56px; height:56px; object-fit:contain; margin-bottom:8px; }
+            .carousel-title { font-weight:700; font-size:0.95rem; }
+
+
+            @media (max-width: 860px) {
+                .home-features { grid-template-columns: 1fr; }
+                .editor-carousel { margin-bottom: 12px; }
+            }
+
             .faq details { margin: 12px 0; }
 
             .faq summary { cursor: pointer; font-weight: 700; padding: 8px 6px; }
@@ -307,26 +328,7 @@
                 margin-left: 10px;
             }
 
-            select#defaultFilter {
-                padding: 8px 12px;
-                border-radius: 8px;
-                border: 1px solid #ccc;
-                background: var(--card);
-                color: var(--text);
-                font-size: 1rem;
-                cursor: pointer;
-                transition: all .25s;
-            }
 
-            select#defaultFilter:hover {
-                border-color: var(--accent);
-            }
-
-            select#defaultFilter:focus {
-                outline: none;
-                border-color: var(--accent);
-                box-shadow: 0 0 5px rgba(74,144,226,0.5);
-            }
 
             .switch {
                 position: relative;
@@ -512,37 +514,30 @@
                 <p class="lead">A Fast, Curated Portal for Playing HTML Games — Built to Be Simple, Safe, & Enjoyable</p>
             </div>
 
-            <div class="card-grid">
-                <div class="card hoverable">
-                    <h2 id="mostPopularGamesHeader">Unable to Access This Content...</h2>
-                    <p>We Only Include Popular & Fun Games That Are Worth Your Time</p>
+            <div class="home-features" style="display:grid;grid-template-columns: 1fr 320px;gap:20px;align-items:start;">
+                <div class="editors-wrapper">
+                    <h2>Editor’s Picks</h2>
+                    <div class="editor-carousel" id="editorsCarousel" aria-roledescription="carousel">
+                        <div class="carousel-track" id="carouselTrack" role="list" tabindex="0" aria-label="Editor\'s Picks carousel"></div>
+                    </div>
+                    <div class="muted">Curated by the Celestrium Online Team — Click a Game to Play</div>
                 </div>
-                <div class="card hoverable">
-                    <h2>Works on All Accounts</h2>
-                    <p id="elementaryWorkingGamesHeader">Unable to Access This Content...</p>
+
+                <div class="side-actions">
+                    <div class="card hoverable">
+                        <h3>Play Random</h3>
+                        <p class="muted">Instantly Start a Random Editor's Pick</p>
+                        <div style="margin-top:14px;">
+                            <button id="playRandomBtn" class="save-btn">Play Random</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="card hoverable">
-                    <h2>Fast Search Available</h2>
-                    <p>You Can Quickly Find Any Game</p>
-                </div>
-                <div class="card hoverable">
-                    <h2>Light & Dark Mode Available</h2>
-                    <p>You Can Switch Between Light & Dark Mode in Settings</p>
-                </div>
-                <div class="card hoverable">
-                    <h2>"Escape" Keybind and Tab Cloak Available</h2>
-                    <p>You Can Set an "Escape" Keybind & Tab Cloak in Settings</p>
-                </div>
-                <div class="card hoverable">
-                    <h2>Regular Updates</h2>
-                    <p>New Games Are Added Frequently to Keep The Collection Fresh & Fun</p>
-                </div>
-            </div>
+            </div>    
         </div>
 
         <div id="all" class="page">
             <h1 class="center">All Games</h1>
-            <p class="school-note">Use the search bar below to find a game. To filter for elementary & middle school compatible games, adjust the default game filter in Settings.</p>
+            <p class="school-note">Use the search bar below to find a game.</p>
 
             <div class="search-bar">
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
@@ -586,7 +581,7 @@
                             <li>Fast Loading — Optimized assets for quick navigation</li>
                             <li>Privacy Tools — Tab cloak and escape keybind</li>
                             <li>Responsive Design — Works on school chromebooks, other laptops, tablets, and phones</li>
-                            <li>Customizable Settings — Dark mode, animations toggle, default game filter</li>
+                            <li>Customizable Settings — Dark mode & animations toggle</li>
                         </ul>
                     </div>
 
@@ -594,7 +589,7 @@
                         <h3>Credits</h3>
                         <p>Created and maintained by the Celestrium Online team. Special thanks to contributors who helped keep the experience lightweight and reliable.</p>
 
-                        <h3>Privacy &amp; Safety</h3>
+                        <h3>Privacy & Safety</h3>
                         <p>
                             We do not collect personal data by default. Built-in privacy tools (tab cloak, favicon controls)
                             are session-only and do not persist to storage unless explicitly used via the Settings page.
@@ -680,15 +675,6 @@
                 </label>
             </div>
 
-            <h2 class="mb-10">Game Organization</h2>
-            <div class="setting-row">
-                <span>Default Game Filter</span>
-                <select id="defaultFilter">
-                    <option value="all">All Games</option>
-                    <option value="elem-middle" selected>Elementary & Middle School Only</option>
-                </select>
-            </div>
-
             <h2 class="mb-10">Privacy Tools</h2>
             <div class="setting-row">
                 <span>Escape Keybind</span>
@@ -740,7 +726,6 @@
                 const logoBtn = $('#logoBtn');
                 const navLinks = $('#navLinks');
                 const darkToggle = $('#darkToggle');
-                const defaultFilter = $('#defaultFilter');
                 const listEl = $('#gameList');
                 const searchEl = $('#search');
                 const noResultsEl = $('#no-results');
@@ -750,8 +735,21 @@
                 const keybindInput = $('#keybindInput');
                 const saveKeybindBtn = $('#saveKeybindBtn');
                 const resetKeybindBtn = $('#resetKeybindBtn');
-                const mostPopularGamesHeader = $('#mostPopularGamesHeader');
-                const elementaryWorkingGamesHeader = $('#elementaryWorkingGamesHeader');
+                const editorsPicks = [
+                    {name: '10 Minutes Till Dawn', favicon: './favicon.ico'},
+                    {name: 'Brawl Stars', favicon: './favicon.ico'},
+                    {name: 'Cookie Clicker', favicon: './favicon.ico'},
+                    {name: 'Drive Mad (Fanmade)', favicon: './favicon.ico'},
+                    {name: 'Eaglercraft 1.8', favicon: './favicon.ico'},
+                    {name: 'Polytrack 0.5.0', favicon: './favicon.ico'},
+                    {name: 'Speed Per Click', favicon: './favicon.ico'},
+                    {name: 'Steal A Brainrot', favicon: './favicon.ico'},
+                    {name: 'Stickman Hook', favicon: './favicon.ico'},
+                    {name: 'Time Shooter 3 S.W.A.T', favicon: './favicon.ico'},
+                    {name: 'Tomb of the Mask', favicon: './favicon.ico'}
+                ];
+                const editorsCarouselTrack = document.getElementById('carouselTrack');
+                const playRandomBtn = document.getElementById('playRandomBtn');
                 const cloakInput = $('#cloakInput');
                 const saveCloakBtn = $('#saveCloakBtn');
                 const resetCloakBtn = $('#resetCloakBtn');
@@ -811,13 +809,109 @@
                     const enable = animationsToggle.checked;
                     $$('#home .card').forEach(el => el.classList.toggle('hoverable', enable));
                     $$('#all .game-item').forEach(el => el.classList.toggle('hoverable', enable));
+                    $$('#home .carousel-item').forEach(el => el.classList.toggle('hoverable', enable));
                 };
                 animationsToggle.addEventListener('change', updateAnimations);
                 updateAnimations();
 
-                mostPopularGamesHeader.textContent = Math.floor(games.length/5)*5 + '+ of the Most Popular Games';
-                const elmWorkingGames = games.filter(g => g.grade === 'all-grades').length;
-                elementaryWorkingGamesHeader.textContent = `${elmWorkingGames}/${games.length} of Our Games Are Elementary & Middle School Compatible`;
+                function findGameByName(name) {
+                    return games.find(g => g.name && g.name.toLowerCase() === (name || '').toLowerCase());
+                }
+
+                function renderEditorsPicks() {
+                    if (!editorsCarouselTrack) return;
+                    editorsCarouselTrack.innerHTML = '';
+                    if (!editorsPicks || editorsPicks.length === 0) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'carousel-empty';
+                        fallback.textContent = 'No Editor\'s Picks configured. Add items to the `editorsPicks` array in the script.';
+                        editorsCarouselTrack.appendChild(fallback);
+                        return;
+                    }
+
+                    editorsPicks.forEach((item) => {
+                        const g = findGameByName(item.name);
+                        const btn = document.createElement('button');
+                        btn.className = 'carousel-item hoverable';
+                        btn.setAttribute('role','listitem');
+                        btn.dataset.url = g ? (g.url + '?login.live.com') : '';
+                        btn.innerHTML = `\n                            <img src="${item.favicon || ''}" alt="${item.name} icon" onerror="this.style.visibility='hidden'">\n                            <div class=\"carousel-title\">${item.name}</div>`;
+                        btn.addEventListener('click', () => {
+                            if (btn.dataset.url) openGame(btn.dataset.url);
+                            else alert('Game not found in list: ' + item.name + '\nMake sure the name matches a game from `games.js`.');
+                        });
+                        editorsCarouselTrack.appendChild(btn);
+                    });
+
+                    startAutoScroll();
+                }
+
+                if (playRandomBtn) playRandomBtn.addEventListener('click', () => {
+                    const candidates = editorsPicks.map(p => findGameByName(p.name)).filter(Boolean);
+                    let pick = null;
+                    if (candidates.length > 0) pick = candidates[Math.floor(Math.random()*candidates.length)];
+                    else if (games.length) pick = games[Math.floor(Math.random()*games.length)];
+                    if (pick) openGame(pick.url + '?login.live.com');
+                    else alert('No games available to play.');
+                });
+
+                const AUTO_SCROLL_PX_PER_SEC = 22;
+                let _autoScrollId = null;
+                let _lastTs = null;
+                let _autoPaused = false;
+                let _pointerInteraction = false;
+                let _resumeTimeout = null;
+
+                function autoScrollStep(ts) {
+                    if (!editorsCarouselTrack) return;
+                    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return stopAutoScroll();
+                    if (!animationsToggle.checked) return stopAutoScroll();
+
+                    if (_autoPaused || _pointerInteraction) { _lastTs = ts; _autoScrollId = requestAnimationFrame(autoScrollStep); return; }
+                    if (_lastTs == null) _lastTs = ts;
+                    const dt = ts - _lastTs;
+                    _lastTs = ts;
+                    const dx = (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+                    editorsCarouselTrack.scrollLeft += dx;
+
+                    const maxScroll = editorsCarouselTrack.scrollWidth - editorsCarouselTrack.clientWidth;
+                    if (maxScroll > 0 && editorsCarouselTrack.scrollLeft >= maxScroll - 1) {
+                        editorsCarouselTrack.scrollTo({ left: 0, behavior: 'smooth' });
+                    }
+
+                    _autoScrollId = requestAnimationFrame(autoScrollStep);
+                }
+
+                function startAutoScroll() {
+                    if (_autoScrollId) return;
+                    _autoPaused = false; _pointerInteraction = false; _lastTs = null;
+                    _autoScrollId = requestAnimationFrame(autoScrollStep);
+                }
+
+                function stopAutoScroll() {
+                    if (_autoScrollId) { cancelAnimationFrame(_autoScrollId); _autoScrollId = null; }
+                    _lastTs = null;
+                }
+
+                if (editorsCarouselTrack) {
+                    editorsCarouselTrack.addEventListener('mouseenter', () => { _autoPaused = true; });
+                    editorsCarouselTrack.addEventListener('mouseleave', () => { _autoPaused = false; });
+                    editorsCarouselTrack.addEventListener('focusin', () => { _autoPaused = true; });
+                    editorsCarouselTrack.addEventListener('focusout', () => { _autoPaused = false; });
+
+                    editorsCarouselTrack.addEventListener('pointerdown', () => {
+                        _pointerInteraction = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _pointerInteraction = false; }, 1500);
+                    });
+                    editorsCarouselTrack.addEventListener('wheel', () => {
+                        _pointerInteraction = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _pointerInteraction = false; }, 1500);
+                    }, { passive: true });
+                }
+
+                animationsToggle.addEventListener('change', () => {
+                    if (animationsToggle.checked) startAutoScroll(); else stopAutoScroll();
+                });
+
+                renderEditorsPicks();
 
                 function createGameItem(g) {
                     const a = document.createElement('a');
@@ -836,13 +930,12 @@
 
                 function renderGames() {
                     const q = (searchEl.value || '').toLowerCase();
-                    const filter = defaultFilter.value;
                     listEl.innerHTML = '';
                     const frag = document.createDocumentFragment();
                     let count = 0;
 
                     for (const g of games) {
-                        if ((g.name.toLowerCase().includes(q)) && (filter === 'all' || g.grade === 'all-grades')) {
+                        if (g.name.toLowerCase().includes(q)) {
                             frag.appendChild(createGameItem(g));
                             count++;
                         }
@@ -861,13 +954,12 @@
                 });
 
                 searchEl.addEventListener('input', debounce(renderGames));
-                defaultFilter.addEventListener('change', renderGames);
                 renderGames();
 
                 $('#resetButton').addEventListener('click', () => {
                     darkToggle.checked = false; document.body.classList.remove('dark');
                     animationsToggle.checked = true; updateAnimations();
-                    defaultFilter.value = 'all'; searchEl.value = '';
+                    searchEl.value = '';
                     renderGames();
                     escapeKeybind = null; keybindInput.value = '';
                     document.title = ORIGINAL_TITLE;
