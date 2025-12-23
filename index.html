@@ -268,12 +268,19 @@
             }
 
             .about-features li {
-                background: linear-gradient(90deg, rgba(74,144,226,0.04), transparent 40%);
+                background: linear-gradient(90deg, rgba(74,144,226,0.08), transparent 40%);
+                background-color: rgba(0,0,0,0.02);
                 padding: 12px 14px;
                 border-radius: 10px;
                 color: var(--text);
                 font-weight: 600;
                 line-height: 1.45;
+                transition: background .25s, color .25s;
+            }
+
+            body.dark .about-features li {
+                background: linear-gradient(90deg, rgba(94,168,255,0.04), transparent 40%);
+                background-color: rgba(255,255,255,0.02);
             }
 
             .about-side {
