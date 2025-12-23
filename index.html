@@ -284,7 +284,18 @@
             .home-features > .side-actions { display: flex; align-items: stretch; }
             .side-actions { min-width: 0; }
             /* Allow the left grid column to shrink instead of growing (prevents pushing the side card off-screen) */
-            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; }
+            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; position:relative; }
+            .carousel-debug {
+                position: absolute;
+                right: 12px;
+                bottom: 12px;
+                background: rgba(0,0,0,0.04);
+                color: var(--subtext);
+                padding: 6px 8px;
+                border-radius: 8px;
+                font-size: 12px;
+                pointer-events: none;
+            }
             .editors-wrapper h2 { margin: 0 0 12px 0; font-size: 1.5rem; }
             .editor-carousel { flex:1; display:flex; align-items:center; gap:10px; min-width: 0; overflow: hidden; min-height: 180px; }
             .carousel-track { display:flex; gap:12px; overflow-x:auto; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; padding:12px; min-width: 0; }
@@ -545,6 +556,7 @@
                     <h2>Editor’s Picks</h2>
                     <div class="editor-carousel" id="editorsCarousel" aria-roledescription="carousel">
                         <div class="carousel-track" id="carouselTrack" role="list" tabindex="0" aria-label="Editor\'s Picks carousel"></div>
+                        <div id="carouselDebug" class="carousel-debug" aria-hidden="true">Auto-scroll: idle</div>
                     </div>
                     <div class="muted">Curated by the Celestrium Online Team — Click a Game to Play</div>
                 </div>
@@ -769,6 +781,7 @@
                     {name: 'Polytrack 0.5.0', favicon: './favicon.ico?login.live.com'},
                     {name: 'Speed Per Click', favicon: './favicon.ico?login.live.com'},
                     {name: 'Steal A Brainrot', favicon: './favicon.ico?login.live.com'},
+                    {name: 'Stickman Climb', favicon: './favicon.ico?login.live.com'},
                     {name: 'Stickman Hook', favicon: './favicon.ico?login.live.com'},
                     {name: 'Time Shooter 3 S.W.A.T', favicon: './favicon.ico?login.live.com'},
                     {name: 'Tomb of the Mask', favicon: './favicon.ico?login.live.com'}
@@ -939,7 +952,126 @@
                 let _resumeTimeout = null;
                 let _singleSetWidth = 0;
 
+                // Debug & fallback helpers
+                const carouselDebugEl = document.getElementById('carouselDebug');
+                let _lastDebugUpdate = 0;
+
+                function updateDebug(msg, force) {
+                    const now = performance.now();
+                    if (!force && (now - _lastDebugUpdate) < 250) return; // throttle DOM updates
+                    _lastDebugUpdate = now;
+                    try { if (carouselDebugEl) carouselDebugEl.textContent = 'Auto-scroll: ' + msg; } catch (e) {}
+                }
+
+                // Transform-based marquee fallback (JS-driven, uses RAF)
+                let _useTransformMarquee = false;
+                let _marqueeRoot = null;
+                let _marqueeInner = null;
+                let _transformOffset = 0;
+                let _transformLastTs = null;
+                let _transformRafId = null;
+                let _transformInnerWidth = 0;
+
+                function transformMarqueeStep(ts) {
+                    if (!_useTransformMarquee || !_marqueeInner) { _transformLastTs = null; return; }
+                    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { _transformLastTs = null; return; }
+                    if (!animationsToggle.checked) { _transformLastTs = null; return; }
+
+                    if (_autoPaused || _pointerInteraction) { _transformLastTs = ts; _transformRafId = requestAnimationFrame(transformMarqueeStep); return; }
+                    if (_transformLastTs == null) _transformLastTs = ts;
+                    const dt = ts - _transformLastTs;
+                    _transformLastTs = ts;
+                    const delta = (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
+                    _transformOffset += delta;
+                    if (_transformInnerWidth > 0 && _transformOffset >= _transformInnerWidth) {
+                        _transformOffset -= _transformInnerWidth;
+                        try { console.debug('Editor carousel (transform): wrapped', { innerWidth: _transformInnerWidth }); } catch (e) {}
+                    }
+                    // Apply transform (negative to move left)
+                    _marqueeInner.style.transform = 'translateX(' + (-_transformOffset) + 'px)';
+
+                    // Throttled debug update
+                    updateDebug('fallback (transform) · ' + Math.round(_transformOffset) + 'px');
+
+                    _transformRafId = requestAnimationFrame(transformMarqueeStep);
+                }
+
+                function enableTransformMarquee() {
+                    if (_useTransformMarquee || !editorsCarouselTrack) return;
+                    _useTransformMarquee = true;
+                    updateDebug('fallback (transform)', true);
+
+                    // Build marqueeRoot and inner container
+                    _marqueeRoot = document.createElement('div');
+                    _marqueeRoot.className = 'marquee';
+                    _marqueeInner = document.createElement('div');
+                    _marqueeInner.className = 'marquee-inner';
+
+                    // Move existing items into inner once and duplicate for seamless loop
+                    const items = Array.from(editorsCarouselTrack.children).filter(n => n.classList && n.classList.contains && n.classList.contains('carousel-item'));
+                    if (!items.length) return;
+                    // Create two sets
+                    const setA = document.createElement('div'); setA.style.display = 'inline-flex'; setA.style.gap = '12px';
+                    const setB = document.createElement('div'); setB.style.display = 'inline-flex'; setB.style.gap = '12px';
+                    items.forEach(it => setA.appendChild(it.cloneNode(true)));
+                    items.forEach(it => setB.appendChild(it.cloneNode(true)));
+
+                    _marqueeInner.appendChild(setA);
+                    _marqueeInner.appendChild(setB);
+                    _marqueeRoot.appendChild(_marqueeInner);
+
+                    // Clear track and append marqueeRoot
+                    editorsCarouselTrack.innerHTML = '';
+                    editorsCarouselTrack.appendChild(_marqueeRoot);
+
+                    // Measure inner width (the width of a single set)
+                    requestAnimationFrame(() => {
+                        _transformInnerWidth = setA.offsetWidth || _marqueeInner.scrollWidth / 2;
+                        _transformOffset = 0;
+                        _transformLastTs = null;
+                        if (_transformRafId) cancelAnimationFrame(_transformRafId);
+                        _transformRafId = requestAnimationFrame(transformMarqueeStep);
+                    });
+                }
+
+                function disableTransformMarquee() {
+                    if (!_useTransformMarquee || !editorsCarouselTrack) return;
+                    _useTransformMarquee = false;
+                    // cancel RAF
+                    if (_transformRafId) { cancelAnimationFrame(_transformRafId); _transformRafId = null; }
+                    _transformLastTs = null; _transformOffset = 0; _transformInnerWidth = 0;
+                    // Rebuild canonical set into track (use existing DOM nodes if possible)
+                    const nodes = document.querySelectorAll('.carousel-item');
+                    editorsCarouselTrack.innerHTML = '';
+                    nodes.forEach(n => editorsCarouselTrack.appendChild(n.cloneNode(true)));
+                    updateDebug('js scrollLeft', true);
+                }
+
+                function probeAutoScroll() {
+                    if (!editorsCarouselTrack) return;
+                    // If no overflow, nothing to do
+                    if (editorsCarouselTrack.scrollWidth <= editorsCarouselTrack.clientWidth) { updateDebug('idle'); return; }
+                    // Short probe: measure scrollLeft change after small programmatic move
+                    try {
+                        const before = editorsCarouselTrack.scrollLeft;
+                        // nudge by 2px
+                        editorsCarouselTrack.scrollLeft += 2;
+                        setTimeout(() => {
+                            const after = editorsCarouselTrack.scrollLeft;
+                            // restore
+                            if (after !== before) editorsCarouselTrack.scrollLeft = before;
+                            if (Math.abs(after - before) < 1) {
+                                console.warn('Editor carousel: scrollLeft not producing visible movement; enabling transform fallback');
+                                enableTransformMarquee();
+                            } else {
+                                updateDebug('js scrollLeft', true);
+                            }
+                        }, 220);
+                    } catch (e) { enableTransformMarquee(); }
+                }
+
                 function autoScrollStep(ts) {
+                    if (_useTransformMarquee) { _autoScrollId = requestAnimationFrame(autoScrollStep); return; }
                     if (!editorsCarouselTrack) return;
                     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return stopAutoScroll();
                     if (!animationsToggle.checked) return stopAutoScroll();
@@ -954,7 +1086,7 @@
                     const dx = (AUTO_SCROLL_PX_PER_SEC * dt) / 1000;
                     editorsCarouselTrack.scrollLeft += dx;
 
-                    // Seamless wrap: if we've scrolled past one full set, subtract that width for a continuous loop
+                    // Seamless wrap
                     if (_singleSetWidth > 0) {
                         while (editorsCarouselTrack.scrollLeft >= _singleSetWidth) {
                             editorsCarouselTrack.scrollLeft -= _singleSetWidth;
@@ -962,26 +1094,36 @@
                         }
                     }
 
+                    // Throttled debug update
+                    updateDebug('js scrollLeft · ' + Math.round(editorsCarouselTrack.scrollLeft));
+
                     _autoScrollId = requestAnimationFrame(autoScrollStep);
                 }
 
                 function startAutoScroll() {
+                    // If transform fallback already in-place, ensure it's running
+                    if (_useTransformMarquee && _marqueeRoot) { if (!_transformRafId) _transformRafId = requestAnimationFrame(transformMarqueeStep); return; }
                     if (_autoScrollId) return;
                     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
                     if (!animationsToggle.checked) return;
                     if (editorsCarouselTrack && editorsCarouselTrack.scrollWidth <= editorsCarouselTrack.clientWidth) return; // nothing to scroll
                     _autoPaused = false; _pointerInteraction = false; _lastTs = null;
-                    // ensure we don't have smooth scrolling interfering with manual scrollLeft updates
                     if (editorsCarouselTrack) editorsCarouselTrack.style.scrollBehavior = 'auto';
                     if (editorsCarouselTrack && editorsCarouselTrack.scrollLeft === 0) editorsCarouselTrack.scrollLeft = 1;
                     try { console.info('Editor carousel: starting auto-scroll', { singleSetWidth: _singleSetWidth, scrollWidth: editorsCarouselTrack.scrollWidth, clientWidth: editorsCarouselTrack.clientWidth }); } catch (e) {}
                     _autoScrollId = requestAnimationFrame(autoScrollStep);
+
+                    // Probe whether scrollLeft produces visible movement; if not, fallback
+                    probeAutoScroll();
                 }
 
                 function stopAutoScroll() {
                     if (_autoScrollId) { cancelAnimationFrame(_autoScrollId); _autoScrollId = null; }
                     _lastTs = null;
                     if (editorsCarouselTrack) editorsCarouselTrack.style.scrollBehavior = '';
+                    // If using transform fallback, stop its RAF as well
+                    if (_transformRafId) { cancelAnimationFrame(_transformRafId); _transformRafId = null; }
+                    updateDebug('idle', true);
                 }
 
                 if (editorsCarouselTrack) {

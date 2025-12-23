@@ -67,6 +67,7 @@ const games = [
     {name:"Speed Per Click", url:"speed-per-click/"},
     {name:"Steal A Brainrot", url:"steal-a-brainrot/"},
     {name:"Stick Warriors", url:"stick-warriors/"},
+    {name:"Stickman Climb", url:"stickman-climb/"},
     {name:"Stickman Hook", url:"stickman-hook/"},
     // {name:"Subway Surfers - New York City", url:"subway-surfers-nyc/", grade:"high-school-only"},
     // {name:"Subway Surfers - San Fransisco", url:"subway-surfers-san-fransisco/", grade:"high-school-only"},
