@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Celestrium Online Portal</title>
-        <meta name="app-version" content="3.7.5">
+        <meta name="app-version" content="3.7.14">
         <link rel="icon" type="image/x-icon" href="./favicon.ico?login.live.com">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -285,17 +285,6 @@
             .side-actions { min-width: 0; }
             /* Allow the left grid column to shrink instead of growing (prevents pushing the side card off-screen) */
             .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; position:relative; }
-            .carousel-debug {
-                position: absolute;
-                right: 12px;
-                bottom: 12px;
-                background: rgba(0,0,0,0.04);
-                color: var(--subtext);
-                padding: 6px 8px;
-                border-radius: 8px;
-                font-size: 12px;
-                pointer-events: none;
-            }
             .editors-wrapper h2 { margin: 0 0 12px 0; font-size: 1.5rem; }
             .editor-carousel { flex:1; display:flex; align-items:center; gap:10px; min-width: 0; overflow: hidden; min-height: 180px; }
             .carousel-track { display:flex; gap:12px; overflow: hidden; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; padding:12px; min-width: 0; }
@@ -559,7 +548,6 @@
                     <h2>Editor’s Picks</h2>
                     <div class="editor-carousel" id="editorsCarousel" aria-roledescription="carousel">
                         <div class="carousel-track" id="carouselTrack" role="list" tabindex="0" aria-label="Editor\'s Picks carousel"></div>
-                        <div id="carouselDebug" class="carousel-debug" aria-hidden="true">Auto-scroll: idle</div>
                     </div>
                     <div class="muted">Curated by the Celestrium Online Team — Click a Game to Play</div>
                 </div>
@@ -937,7 +925,7 @@
 
 
                 // Marquee implementation (primary, JS-driven transform)
-                const AUTO_SCROLL_PX_PER_SEC = 28;
+                const AUTO_SCROLL_PX_PER_SEC = 45;
                 let _marqueeRaf = null;
                 let _marqueeLastTs = null;
                 let _marqueeOffset = 0;
@@ -946,13 +934,10 @@
                 let _marqueePaused = false;
                 let _resumeTimeout = null;
 
-                const carouselDebugEl = document.getElementById('carouselDebug');
                 let _lastDebugUpdate = 0;
                 function updateDebug(msg, force) {
-                    const now = performance.now();
-                    if (!force && (now - _lastDebugUpdate) < 160) return; // throttle DOM updates
-                    _lastDebugUpdate = now;
-                    try { if (carouselDebugEl) carouselDebugEl.textContent = 'Auto-scroll: ' + msg; } catch (e) {}
+                    // on-screen debug badge removed; log to console for diagnostics only
+                    try { console.debug('Editor carousel:', msg); } catch (e) {}
                 }
 
                 function marqueeStep(ts) {
@@ -1194,7 +1179,7 @@
                         
                         if (newVersion && newVersion !== currentVersion) {
                             updateAvailable = true;
-                            alert('New version detected. Current Version is: ' + currentVersion + '. New Version is:' + newVersion + ".\n\nThis website will be automatically reloaded if you switch to a different page.");
+                            alert('New version detected. Current Version is: ' + currentVersion + '. New Version is: ' + newVersion + ".\n\nThis website will be automatically reloaded if you switch to a different page.");
                         }
                     } catch (error) {
                         console.log('Version check failed (offline?)', error);
