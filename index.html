@@ -908,9 +908,6 @@
                         editorsCarouselTrack.style.scrollBehavior = 'auto';
 
                         startAutoScroll();
-
-                        // Ensure the Editor's Picks and Play Random boxes match heights
-                        try { syncFeatureHeights(); } catch (e) { /* ignore */ }
                     });
 
                     // Use event delegation so cloned nodes work without reattaching listeners
@@ -1007,28 +1004,8 @@
 
                 renderEditorsPicks();
 
-                // Ensure the two side boxes match height (desktop) and update on resize
-                function syncFeatureHeights() {
-                    const editors = document.querySelector('.editors-wrapper');
-                    const playCard = document.querySelector('.side-actions .card.play-random-card');
-                    if (!editors || !playCard) return;
-                    // On narrow screens stacked layout, remove enforced heights
-                    if (window.innerWidth <= 860) { editors.style.minHeight = ''; playCard.style.minHeight = ''; return; }
-                    // Compute natural heights and set both to the max
-                    // Use offsetHeight to include padding
-                    const h1 = editors.offsetHeight;
-                    const h2 = playCard.offsetHeight;
-                    const max = Math.max(h1, h2, 220);
-                    editors.style.minHeight = max + 'px';
-                    playCard.style.minHeight = max + 'px';
-                }
-
-                // Debounce resize handler
-                let _syncResizeTimer = null;
-                window.addEventListener('resize', () => { clearTimeout(_syncResizeTimer); _syncResizeTimer = setTimeout(syncFeatureHeights, 120); });
-
-                // Trigger after initial render and warn about any names not found in games.js
-                try { syncFeatureHeights(); } catch (e) {}
+                // Layout heights: rely on CSS `min-height: 220px` for both boxes to keep them a normal, consistent size on desktop.
+                // (Removed JS height-sync which caused both boxes to become taller in some viewports.)
 
                 if (Array.isArray(editorsPicks) && editorsPicks.length) {
                     const missing = editorsPicks.map(p => p && p.name).filter(Boolean).filter(n => !findGameByName(n));
