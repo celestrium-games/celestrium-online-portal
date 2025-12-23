@@ -281,11 +281,12 @@
 
             /* Editor's Picks carousel styles */
             .home-features { margin-top: 28px; display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: stretch; }
+            .home-features > .side-actions { display: flex; align-items: stretch; }
+            .side-actions { min-width: 0; }
             /* Allow the left grid column to shrink instead of growing (prevents pushing the side card off-screen) */
-            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); }
+            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; }
             .editors-wrapper h2 { margin: 0 0 12px 0; font-size: 1.5rem; }
-            .editor-carousel { min-height: 200px; align-items: center; }
-            .editor-carousel { display:flex; align-items:center; gap:10px; min-width: 0; overflow: hidden; }
+            .editor-carousel { flex:1; display:flex; align-items:center; gap:10px; min-width: 0; overflow: hidden; min-height: 180px; }
             .carousel-track { display:flex; gap:12px; overflow-x:auto; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; padding:12px; min-width: 0; }
 
             /* Hide scrollbars but keep scrolling functional */
@@ -539,7 +540,7 @@
                 <p class="lead">A Fast, Curated Portal for Playing HTML Games — Built to Be Simple, Safe, & Enjoyable</p>
             </div>
 
-            <div class="home-features" style="display:grid;grid-template-columns: 1fr 320px;gap:20px;align-items:start;">
+            <div class="home-features">
                 <div class="editors-wrapper">
                     <h2>Editor’s Picks</h2>
                     <div class="editor-carousel" id="editorsCarousel" aria-roledescription="carousel">
@@ -550,11 +551,10 @@
 
                 <div class="side-actions">
                     <div class="card hoverable play-random-card">
-                        <h3>Play Random</h3>
-                        <p class="muted">Instantly start a random Editor's Pick — try something new!</p>
-                        <div style="margin-top:14px;">
+                        <div style="margin-bottom:14px;">
                             <button id="playRandomBtn" class="play-random-btn" aria-label="Play a random game"><i class="fas fa-dice"></i> Play Random</button>
                         </div>
+                        <p class="muted">Instantly Start a Random Editor's Pick — Try Something New!</p>
                     </div>
                 </div>
             </div>    
@@ -562,7 +562,6 @@
 
         <div id="all" class="page">
             <h1 class="center">All Games</h1>
-            <p class="school-note">Use the search bar below to find a game.</p>
 
             <div class="search-bar">
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
@@ -582,9 +581,9 @@
         </div>
 
         <div id="about" class="page">
-            <h1 class="center">About Celestrium Online</h1>
 
             <div class="about-card">
+                <h1 class="center">About Celestrium Online</h1>
                 <div class="about-grid">
                     <div class="about-main">
                         <h2 class="accent">Our Mission</h2>
@@ -909,6 +908,9 @@
                         editorsCarouselTrack.style.scrollBehavior = 'auto';
 
                         startAutoScroll();
+
+                        // Ensure the Editor's Picks and Play Random boxes match heights
+                        try { syncFeatureHeights(); } catch (e) { /* ignore */ }
                     });
 
                     // Use event delegation so cloned nodes work without reattaching listeners
@@ -1005,7 +1007,29 @@
 
                 renderEditorsPicks();
 
-                // Validate configured Editor's Picks and warn about any names not found in games.js
+                // Ensure the two side boxes match height (desktop) and update on resize
+                function syncFeatureHeights() {
+                    const editors = document.querySelector('.editors-wrapper');
+                    const playCard = document.querySelector('.side-actions .card.play-random-card');
+                    if (!editors || !playCard) return;
+                    // On narrow screens stacked layout, remove enforced heights
+                    if (window.innerWidth <= 860) { editors.style.minHeight = ''; playCard.style.minHeight = ''; return; }
+                    // Compute natural heights and set both to the max
+                    // Use offsetHeight to include padding
+                    const h1 = editors.offsetHeight;
+                    const h2 = playCard.offsetHeight;
+                    const max = Math.max(h1, h2, 220);
+                    editors.style.minHeight = max + 'px';
+                    playCard.style.minHeight = max + 'px';
+                }
+
+                // Debounce resize handler
+                let _syncResizeTimer = null;
+                window.addEventListener('resize', () => { clearTimeout(_syncResizeTimer); _syncResizeTimer = setTimeout(syncFeatureHeights, 120); });
+
+                // Trigger after initial render and warn about any names not found in games.js
+                try { syncFeatureHeights(); } catch (e) {}
+
                 if (Array.isArray(editorsPicks) && editorsPicks.length) {
                     const missing = editorsPicks.map(p => p && p.name).filter(Boolean).filter(n => !findGameByName(n));
                     if (missing.length) console.warn("Editor's Picks missing in games.js:", missing);
