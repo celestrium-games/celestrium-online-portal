@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Celestrium Online Portal</title>
-        <meta name="app-version" content="3.7.21">
+        <meta name="app-version" content="3.7.22">
         <link rel="icon" type="image/x-icon" href="./favicon.ico?login.live.com">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -284,7 +284,7 @@
             .home-features > .side-actions { display: flex; align-items: stretch; }
             .side-actions { min-width: 0; }
             /* Allow the left grid column to shrink instead of growing (prevents pushing the side card off-screen) */
-            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; position:relative; width:100%; max-width:1100px; }
+            .editors-wrapper { min-width: 0; background: var(--card); padding: 28px; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.05); display:flex; flex-direction:column; min-height:220px; position:relative; width:100%; max-width:1400px; }
             .editors-wrapper h2 { margin: 0 0 12px 0; font-size: 1.5rem; }
             .editor-carousel { flex:1; display:flex; align-items:center; gap:10px; min-width: 0; overflow: hidden; min-height: 180px; }
             .carousel-track { display:flex; gap:12px; overflow: hidden; scroll-behavior:smooth; -webkit-overflow-scrolling: touch; padding:12px; min-width: 0; }
@@ -765,20 +765,20 @@
                 const saveKeybindBtn = $('#saveKeybindBtn');
                 const resetKeybindBtn = $('#resetKeybindBtn');
                 const editorsPicks = [
-                    {name: '10 Minutes Till Dawn', favicon: './favicons/10-minutes-till-dawn.ico?login.live.com'},
-                    {name: 'Brawl Stars', favicon: './favicons/brawl-stars.ico?login.live.com'},
-                    {name: 'Cookie Clicker', favicon: './favicons/cookie-clicker.ico?login.live.com'},
-                    {name: 'Drive Mad (Fanmade)', favicon: './favicons/drive-mad.ico?login.live.com'},
-                    {name: 'Eaglercraft 1.8', favicon: './favicons/eaglercraft.ico?login.live.com'},
-                    {name: 'Monkey Mart', favicon: './favicons/monkey-mart.ico?login.live.com'},
-                    {name: 'Pixel Shooter', favicon: './favicons/pixel-shooter.ico?login.live.com'},
-                    {name: 'Polytrack 0.5.0', favicon: './favicons/polytrack.ico?login.live.com'},
+                    {name: '10 Minutes Till Dawn', favicon: './game-favicons/10-minutes-till-dawn.ico?login.live.com'},
+                    {name: 'Brawl Stars', favicon: './game-favicons/brawl-stars.ico?login.live.com'},
+                    {name: 'Cookie Clicker', favicon: './game-favicons/cookie-clicker.ico?login.live.com'},
+                    {name: 'Drive Mad (Fanmade)', favicon: './game-favicons/drive-mad.ico?login.live.com'},
+                    {name: 'Eaglercraft 1.8', favicon: './game-favicons/eaglercraft.ico?login.live.com'},
+                    {name: 'Monkey Mart', favicon: './game-favicons/monkey-mart.ico?login.live.com'},
+                    {name: 'Pixel Shooter', favicon: './game-favicons/pixel-shooter.ico?login.live.com'},
+                    {name: 'Polytrack 0.5.0', favicon: './game-favicons/polytrack.ico?login.live.com'},
                     {name: 'Speed Per Click', favicon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1FZVhhw218u9ShHS-KfDdJ4rlcVOfBN4tqwW9cwhsyckwqmh2:https://www.citypng.com/public/uploads/preview/hd-roblox-black-symbol-sign-icon-logo-png-70175169478745256ylmn6eud.png%3Fv%3D2025090223&s'},
-                    {name: 'Steal A Brainrot', favicon: './favicons/steal-a-brainrot.ico?login.live.com'},
-                    {name: 'Stickman Climb', favicon: './favicons/stickman-climb.ico?login.live.com'},
-                    {name: 'Stickman Hook', favicon: './favicons/stickman-hook.ico?login.live.com'},
-                    {name: 'Time Shooter 3 S.W.A.T', favicon: './favicons/time-shooter-3-swat.ico?login.live.com'},
-                    {name: 'Tomb of the Mask', favicon: './favicons/tomb-of-the-mask.ico?login.live.com'},
+                    {name: 'Steal A Brainrot', favicon: './game-favicons/steal-a-brainrot.ico?login.live.com'},
+                    {name: 'Stickman Climb', favicon: './game-favicons/stickman-climb.ico?login.live.com'},
+                    {name: 'Stickman Hook', favicon: './game-favicons/stickman-hook.ico?login.live.com'},
+                    {name: 'Time Shooter 3 S.W.A.T', favicon: './game-favicons/time-shooter-3-swat.ico?login.live.com'},
+                    {name: 'Tomb of the Mask', favicon: './game-favicons/tomb-of-the-mask.ico?login.live.com'},
                 ];
                 const editorsCarouselTrack = document.getElementById('carouselTrack');
                 const playRandomBtn = document.getElementById('playRandomBtn');
