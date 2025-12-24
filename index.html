@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Celestrium Online Portal</title>
-        <meta name="app-version" content="3.8.2">
+        <meta name="app-version" content="3.8.3">
         <link rel="icon" type="image/x-icon" href="./favicon.ico?login.live.com">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -309,7 +309,7 @@
             /* Play Random card (can be placed next to carousel) */
             .play-random-card { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:28px; height:100%; min-height:220px; }
             .play-random-btn { background: linear-gradient(90deg, var(--accent), #3a7bd5); color: white; border: none; padding: 14px 22px; border-radius: 12px; font-weight: 800; font-size: 1.06rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 22px rgba(74,144,226,0.18); transition: transform .12s, box-shadow .12s, opacity .12s; width:100%; justify-content:center; }
-            .play-random-btn:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(74,144,226,0.24); }
+            .play-random-btn.hoverable:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(74,144,226,0.24); }
             .play-random-btn i { font-size: 1.15rem; }
 
             /* Responsive tweaks */
@@ -846,6 +846,7 @@
                     $$('#home .card').forEach(el => el.classList.toggle('hoverable', enable));
                     $$('#all .game-item').forEach(el => el.classList.toggle('hoverable', enable));
                     $$('#home .carousel-item').forEach(el => el.classList.toggle('hoverable', enable));
+                    if (playRandomBtn) playRandomBtn.classList.toggle('hoverable', enable);
                 };
                 animationsToggle.addEventListener('change', updateAnimations);
                 updateAnimations();
@@ -916,7 +917,7 @@
                         // Reset transform and start animation if allowed
                         _marqueeOffset = 0; _marqueeLastTs = null;
                         inner.style.transform = 'translateX(0)';
-                        if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) && animationsToggle.checked) startMarquee();
+                        if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) startMarquee();
                         updateDebug('transform init');
                     });
                 }
@@ -950,7 +951,6 @@
                 function marqueeStep(ts) {
                     if (_marqueePaused || !_marqueeInner) { _marqueeLastTs = ts; _marqueeRaf = requestAnimationFrame(marqueeStep); return; }
                     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { stopMarquee(); return; }
-                    if (!animationsToggle.checked) { stopMarquee(); return; }
 
                     if (_marqueeLastTs == null) _marqueeLastTs = ts;
                     const dt = ts - _marqueeLastTs;
@@ -969,7 +969,6 @@
                 function startMarquee() {
                     if (_marqueeRaf) return;
                     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { updateDebug('reduced-motion'); return; }
-                    if (!animationsToggle.checked) { updateDebug('animations off'); return; }
                     if (!_marqueeInner || _marqueeSetWidth <= 0) return;
                     _marqueePaused = false; _marqueeLastTs = null; _marqueeRaf = requestAnimationFrame(marqueeStep);
                     updateDebug('transform running', true);
@@ -984,21 +983,20 @@
 
                 if (editorsCarouselTrack) {
                     editorsCarouselTrack.addEventListener('mouseenter', () => { _marqueePaused = true; stopMarquee(); });
-                    editorsCarouselTrack.addEventListener('mouseleave', () => { _marqueePaused = false; if (animationsToggle.checked) startMarquee(); });
+                    editorsCarouselTrack.addEventListener('mouseleave', () => { _marqueePaused = false; startMarquee(); });
                     editorsCarouselTrack.addEventListener('focusin', () => { _marqueePaused = true; stopMarquee(); });
-                    editorsCarouselTrack.addEventListener('focusout', () => { _marqueePaused = false; if (animationsToggle.checked) startMarquee(); });
+                    editorsCarouselTrack.addEventListener('focusout', () => { _marqueePaused = false; startMarquee(); });
 
                     editorsCarouselTrack.addEventListener('pointerdown', () => {
-                        _marqueePaused = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _marqueePaused = false; if (animationsToggle.checked) startMarquee(); }, 1500);
+                        _marqueePaused = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _marqueePaused = false; startMarquee(); }, 1500);
                     });
                     editorsCarouselTrack.addEventListener('wheel', () => {
-                        _marqueePaused = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _marqueePaused = false; if (animationsToggle.checked) startMarquee(); }, 1500);
+                        _marqueePaused = true; clearTimeout(_resumeTimeout); _resumeTimeout = setTimeout(() => { _marqueePaused = false; startMarquee(); }, 1500);
                     }, { passive: true });
                 }
 
-                animationsToggle.addEventListener('change', () => {
-                    if (animationsToggle.checked) startMarquee(); else stopMarquee();
-                });
+                // carousel unaffected by animations toggle; it always runs unless user prefers reduced motion
+                
 
                 renderEditorsPicks();
 
